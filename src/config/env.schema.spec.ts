@@ -17,7 +17,7 @@ describe('validateEnv', () => {
     STRIPE_WEBHOOK_SECRET: 'whsec_123',
     SMTP_HOST: 'localhost',
     SMTP_PORT: '1025',
-    MAIL_FROM: 'Slotly <no-reply@slotly.local>',
+    MAIL_FROM: 'Reserva <no-reply@reserva.local>',
     CORS_ORIGINS: 'http://localhost:5173',
   };
 

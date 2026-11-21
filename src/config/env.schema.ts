@@ -21,7 +21,7 @@ export const envSchema = z.object({
 
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.coerce.number().default(1025),
-  MAIL_FROM: z.string().default('Slotly <no-reply@slotly.local>'),
+  MAIL_FROM: z.string().default('Reserva <no-reply@reserva.local>'),
 
   CORS_ORIGINS: z.string().default('http://localhost:5173'),
 });

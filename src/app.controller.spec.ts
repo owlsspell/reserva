@@ -15,8 +15,8 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Slotly API"', () => {
-      expect(appController.getHello()).toBe('Slotly API');
+    it('should return "Reserva API"', () => {
+      expect(appController.getHello()).toBe('Reserva API');
     });
   });
 });

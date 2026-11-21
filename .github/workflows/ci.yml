@@ -10,16 +10,16 @@ jobs:
     services:
       postgres:
         image: postgres:16-alpine
-        env: { POSTGRES_USER: slotly, POSTGRES_PASSWORD: slotly, POSTGRES_DB: slotly }
+        env: { POSTGRES_USER: reserva, POSTGRES_PASSWORD: reserva, POSTGRES_DB: reserva }
         ports: ['5432:5432']
         options: >-
-          --health-cmd "pg_isready -U slotly" --health-interval 5s --health-timeout 3s --health-retries 10
+          --health-cmd "pg_isready -U reserva" --health-interval 5s --health-timeout 3s --health-retries 10
       redis:
         image: redis:7-alpine
         ports: ['6379:6379']
         options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
-      DATABASE_URL: postgresql://slotly:slotly@localhost:5432/slotly
+      DATABASE_URL: postgresql://reserva:reserva@localhost:5432/reserva
       REDIS_URL: redis://localhost:6379
     steps:
       - uses: actions/checkout@v4
