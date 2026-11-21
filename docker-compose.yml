@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: reserva
-      POSTGRES_PASSWORD: reserva
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: reserva
     ports: ['5432:5432']
     volumes: [pgdata:/var/lib/postgresql/data]

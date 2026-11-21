@@ -4,11 +4,13 @@ import { randomUUID } from 'crypto';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
+import { HealthModule } from './modules/health/health.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 
 @Module({
   imports: [
     ConfigModule,
+    HealthModule,
     DatabaseModule,
     LoggerModule.forRoot({
       pinoHttp: {

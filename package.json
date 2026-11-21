@@ -21,13 +21,15 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/jest/bin/jest --runInBand",
     "prepare": "husky",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test",
+    "openapi:export": "ts-node -r tsconfig-paths/register src/scripts/export-openapi.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^12.1.1",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/swagger": "^12.1.2",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "class-transformer": "^0.5.1",
