@@ -1,0 +1,39 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: { POSTGRES_USER: slotly, POSTGRES_PASSWORD: slotly, POSTGRES_DB: slotly }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U slotly" --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://slotly:slotly@localhost:5432/slotly
+      REDIS_URL: redis://localhost:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma generate
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm prisma migrate deploy
+      - run: pnpm test:integration
+      - run: pnpm test:e2e
+      - run: pnpm test:concurrency
+      - name: OpenAPI drift check
+        run: pnpm openapi:export && git diff --exit-code openapi.json
