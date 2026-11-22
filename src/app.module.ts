@@ -6,12 +6,14 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { HealthModule } from './modules/health/health.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
     ConfigModule,
     HealthModule,
     DatabaseModule,
+    UsersModule,
     LoggerModule.forRoot({
       pinoHttp: {
         transport:
