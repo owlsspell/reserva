@@ -2,10 +2,12 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './presentation/auth.controller';
+import { MeController } from './presentation/me.controller';
 import { RegisterUserUseCase } from './application/register-user.use-case';
 import { LoginUserUseCase } from './application/login-user.use-case';
 import { RefreshTokenUseCase } from './application/refresh-token.use-case';
 import { LogoutUserUseCase } from './application/logout-user.use-case';
+import { GetMeUseCase } from './application/get-me.use-case';
 import { USER_REPOSITORY } from './application/ports/user.repository';
 import { PrismaUserRepository } from './infrastructure/prisma-user.repository';
 import { PASSWORD_HASHER } from './application/ports/password-hasher';
@@ -30,12 +32,13 @@ import { DatabaseModule } from '../../infrastructure/database/database.module';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, MeController],
   providers: [
     RegisterUserUseCase,
     LoginUserUseCase,
     RefreshTokenUseCase,
     LogoutUserUseCase,
+    GetMeUseCase,
     {
       provide: USER_REPOSITORY,
       useClass: PrismaUserRepository,
@@ -53,6 +56,6 @@ import { DatabaseModule } from '../../infrastructure/database/database.module';
       useClass: SystemClock,
     },
   ],
-  exports: [USER_REPOSITORY, REFRESH_TOKEN_REPOSITORY],
+  exports: [USER_REPOSITORY, REFRESH_TOKEN_REPOSITORY, JwtModule],
 })
 export class UsersModule {}

@@ -24,3 +24,11 @@ export class RefreshTokenReusedError extends DomainError {
     Object.setPrototypeOf(this, RefreshTokenReusedError.prototype);
   }
 }
+
+export class ForbiddenError extends DomainError {
+  constructor(message = 'Access denied') {
+    super(message, ErrorCode.FORBIDDEN, 403);
+    this.name = 'ForbiddenError';
+    Object.setPrototypeOf(this, ForbiddenError.prototype);
+  }
+}
