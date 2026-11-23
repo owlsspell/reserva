@@ -1,5 +1,6 @@
 import { Body, Controller, Post, HttpCode } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import {
   RegisterDto,
   LoginDto,
@@ -16,6 +17,7 @@ import { LogoutUserUseCase } from '../application/logout-user.use-case';
 
 @ApiTags('auth')
 @Controller('auth')
+@Throttle({ default: { limit: 5, ttl: 60000 } })
 export class AuthController {
   constructor(
     private readonly registerUserUseCase: RegisterUserUseCase,
@@ -34,6 +36,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 409, description: 'Email already taken' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 429, description: 'Rate limit exceeded' })
   async register(@Body() dto: RegisterDto): Promise<RegisterResponseDto> {
     const user = await this.registerUserUseCase.execute({
       email: dto.email,
@@ -56,6 +59,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login successful', type: AuthTokensResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthenticated' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 429, description: 'Rate limit exceeded' })
   async login(@Body() dto: LoginDto): Promise<AuthTokensResponseDto> {
     const { tokens } = await this.loginUserUseCase.execute({
       email: dto.email,
@@ -74,6 +78,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Unauthenticated / Expired / Reused refresh token' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 429, description: 'Rate limit exceeded' })
   async refresh(@Body() dto: RefreshTokenDto): Promise<AuthTokensResponseDto> {
     return this.refreshTokenUseCase.execute({
       refreshToken: dto.refreshToken,
@@ -85,6 +90,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout and revoke refresh token family' })
   @ApiResponse({ status: 204, description: 'Logged out successfully' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 429, description: 'Rate limit exceeded' })
   async logout(@Body() dto: LogoutDto): Promise<void> {
     await this.logoutUserUseCase.execute({
       refreshToken: dto.refreshToken,

@@ -75,6 +75,9 @@
           },
           "409": {
             "description": "Email already taken"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "summary": "Register a new user",
@@ -113,6 +116,9 @@
           },
           "401": {
             "description": "Unauthenticated"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "summary": "Login user",
@@ -151,6 +157,9 @@
           },
           "401": {
             "description": "Unauthenticated / Expired / Reused refresh token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "summary": "Refresh access token",
@@ -179,6 +188,9 @@
           },
           "400": {
             "description": "Validation failed"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "summary": "Logout and revoke refresh token family",
