@@ -17,6 +17,28 @@ export class RegisterDto {
   name!: string;
 }
 
+export class LoginDto {
+  @ApiProperty({ example: 'customer@reserva.dev' })
+  @IsEmail()
+  email!: string;
+
+  @ApiProperty({ example: 'StrongPassword123!' })
+  @IsString()
+  password!: string;
+}
+
+export class RefreshTokenDto {
+  @ApiProperty({ example: 'random-refresh-token-hex' })
+  @IsString()
+  refreshToken!: string;
+}
+
+export class LogoutDto {
+  @ApiProperty({ example: 'random-refresh-token-hex' })
+  @IsString()
+  refreshToken!: string;
+}
+
 export class UserResponseDto {
   @ApiProperty({ example: '01900000-0000-0000-0000-000000000000' })
   id!: string;
@@ -48,4 +70,23 @@ export class UserResponseDto {
     dto.createdAt = user.createdAt.toISOString();
     return dto;
   }
+}
+
+export class AuthTokensResponseDto {
+  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsIn...' })
+  accessToken!: string;
+
+  @ApiProperty({ example: 'a3f8c... (refresh token)' })
+  refreshToken!: string;
+
+  @ApiProperty({ example: 900 })
+  expiresIn!: number;
+}
+
+export class RegisterResponseDto {
+  @ApiProperty({ type: UserResponseDto })
+  user!: UserResponseDto;
+
+  @ApiProperty({ type: AuthTokensResponseDto })
+  tokens!: AuthTokensResponseDto;
 }

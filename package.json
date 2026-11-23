@@ -26,8 +26,9 @@
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
-    "@nestjs/config": "^12.1.1",
+    "@nestjs/config": "4.0.0",
     "@nestjs/core": "^11.0.0",
+    "@nestjs/jwt": "11.0.0",
     "@nestjs/platform-express": "^11.0.0",
     "@nestjs/swagger": "^12.1.2",
     "@prisma/adapter-pg": "^7.10.1",
