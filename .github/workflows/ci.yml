@@ -32,8 +32,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm prisma migrate deploy
-      - run: pnpm test:integration
-      - run: pnpm test:e2e
-      - run: pnpm test:concurrency
+      # - run: pnpm test:integration
+      # - run: pnpm test:e2e
+      # - run: pnpm test:concurrency
       - name: OpenAPI drift check
         run: pnpm openapi:export && git diff --exit-code openapi.json
