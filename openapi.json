@@ -280,6 +280,121 @@
           "resources"
         ]
       }
+    },
+    "/resources/{id}/schedule": {
+      "put": {
+        "operationId": "ResourcesController_setSchedule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Schedule updated successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Replace weekly schedule for a resource (Admin only)",
+        "tags": [
+          "resources"
+        ]
+      }
+    },
+    "/resources/{id}/blackouts": {
+      "post": {
+        "operationId": "ResourcesController_addBlackout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlackoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Blackout added successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a blackout period for a resource (Admin only)",
+        "tags": [
+          "resources"
+        ]
+      }
+    },
+    "/resources/{id}/blackouts/{blackoutId}": {
+      "delete": {
+        "operationId": "ResourcesController_deleteBlackout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "blackoutId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Blackout removed successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a blackout period (Admin only)",
+        "tags": [
+          "resources"
+        ]
+      }
     }
   },
   "info": {
@@ -478,6 +593,70 @@
           "city",
           "timezone",
           "pricePerHour"
+        ]
+      },
+      "ScheduleRuleDto": {
+        "type": "object",
+        "properties": {
+          "weekday": {
+            "type": "number",
+            "example": 1,
+            "description": "Weekday 0 (Sunday) to 6 (Saturday)"
+          },
+          "opensAt": {
+            "type": "string",
+            "example": "09:00",
+            "description": "Opening time HH:mm"
+          },
+          "closesAt": {
+            "type": "string",
+            "example": "17:00",
+            "description": "Closing time HH:mm"
+          }
+        },
+        "required": [
+          "weekday",
+          "opensAt",
+          "closesAt"
+        ]
+      },
+      "UpdateScheduleDto": {
+        "type": "object",
+        "properties": {
+          "schedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleRuleDto"
+            }
+          }
+        },
+        "required": [
+          "schedules"
+        ]
+      },
+      "CreateBlackoutDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "example": "2026-12-25T00:00:00.000Z",
+            "description": "Start timestamp (ISO UTC)"
+          },
+          "endsAt": {
+            "type": "string",
+            "example": "2026-12-26T00:00:00.000Z",
+            "description": "End timestamp (ISO UTC)"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Maintenance",
+            "description": "Reason for blackout"
+          }
+        },
+        "required": [
+          "startsAt",
+          "endsAt",
+          "reason"
         ]
       }
     }

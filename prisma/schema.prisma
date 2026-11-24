@@ -36,18 +36,45 @@ model RefreshToken {
 
 
 model Resource {
-  id           String    @id @default(uuid())
+  id           String             @id @default(uuid())
   name         String
   description  String
   type         String
   capacity     Int
   city         String
   timezone     String
-  pricePerHour Int       @map("price_per_hour")
-  archivedAt   DateTime? @map("archived_at")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  pricePerHour Int                @map("price_per_hour")
+  archivedAt   DateTime?          @map("archived_at")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  schedules    ResourceSchedule[]
+  blackouts    ResourceBlackout[]
 
   @@map("resources")
+}
+
+model ResourceSchedule {
+  id         String   @id @default(uuid())
+  resourceId String   @map("resource_id")
+  weekday    Int
+  opensAt    String   @map("opens_at")
+  closesAt   String   @map("closes_at")
+
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@map("resource_schedules")
+}
+
+model ResourceBlackout {
+  id         String   @id @default(uuid())
+  resourceId String   @map("resource_id")
+  startsAt   DateTime @map("starts_at")
+  endsAt     DateTime @map("ends_at")
+  reason     String
+
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@map("resource_blackouts")
 }
 

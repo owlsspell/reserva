@@ -45,6 +45,76 @@ export class PrismaResourceRepository implements ResourceRepository {
     });
   }
 
+  async setSchedule(
+    resourceId: string,
+    schedules: { weekday: number; opensAt: string; closesAt: string }[],
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.resourceSchedule.deleteMany({ where: { resourceId } });
+      if (schedules.length > 0) {
+        await tx.resourceSchedule.createMany({
+          data: schedules.map((s) => ({
+            resourceId,
+            weekday: s.weekday,
+            opensAt: s.opensAt,
+            closesAt: s.closesAt,
+          })),
+        });
+      }
+    });
+  }
+
+  async getSchedules(
+    resourceId: string,
+  ): Promise<{ weekday: number; opensAt: string; closesAt: string }[]> {
+    const records = await this.prisma.resourceSchedule.findMany({
+      where: { resourceId },
+      orderBy: [{ weekday: 'asc' }, { opensAt: 'asc' }],
+    });
+    return records.map((r) => ({
+      weekday: r.weekday,
+      opensAt: r.opensAt,
+      closesAt: r.closesAt,
+    }));
+  }
+
+  async addBlackout(
+    resourceId: string,
+    startsAt: Date,
+    endsAt: Date,
+    reason: string,
+  ): Promise<string> {
+    const blackout = await this.prisma.resourceBlackout.create({
+      data: {
+        resourceId,
+        startsAt,
+        endsAt,
+        reason,
+      },
+    });
+    return blackout.id;
+  }
+
+  async removeBlackout(blackoutId: string): Promise<void> {
+    await this.prisma.resourceBlackout.delete({
+      where: { id: blackoutId },
+    });
+  }
+
+  async getBlackouts(
+    resourceId: string,
+  ): Promise<{ id: string; startsAt: Date; endsAt: Date; reason: string }[]> {
+    const records = await this.prisma.resourceBlackout.findMany({
+      where: { resourceId },
+      orderBy: { startsAt: 'asc' },
+    });
+    return records.map((r) => ({
+      id: r.id,
+      startsAt: r.startsAt,
+      endsAt: r.endsAt,
+      reason: r.reason,
+    }));
+  }
   async findList(params: {
     limit: number;
     cursor?: string;
