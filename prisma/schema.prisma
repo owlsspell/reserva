@@ -34,3 +34,20 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
+
+model Resource {
+  id           String    @id @default(uuid())
+  name         String
+  description  String
+  type         String
+  capacity     Int
+  city         String
+  timezone     String
+  pricePerHour Int       @map("price_per_hour")
+  archivedAt   DateTime? @map("archived_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("resources")
+}
+

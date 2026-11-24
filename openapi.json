@@ -231,6 +231,55 @@
           "users"
         ]
       }
+    },
+    "/resources": {
+      "get": {
+        "operationId": "ResourcesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List resources with filters and cursor pagination",
+        "tags": [
+          "resources"
+        ]
+      },
+      "post": {
+        "operationId": "ResourcesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateResourceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Resource created successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (admin role required)"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a resource (Admin only)",
+        "tags": [
+          "resources"
+        ]
+      }
     }
   },
   "info": {
@@ -380,6 +429,55 @@
         },
         "required": [
           "refreshToken"
+        ]
+      },
+      "CreateResourceDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Conference Room A",
+            "description": "Name of the resource"
+          },
+          "description": {
+            "type": "string",
+            "example": "Spacious room with projector",
+            "description": "Description"
+          },
+          "type": {
+            "type": "string",
+            "example": "room",
+            "description": "Type of resource (room, desk, court)"
+          },
+          "capacity": {
+            "type": "number",
+            "example": 10,
+            "description": "Capacity"
+          },
+          "city": {
+            "type": "string",
+            "example": "Kyiv",
+            "description": "City"
+          },
+          "timezone": {
+            "type": "string",
+            "example": "Europe/Kyiv",
+            "description": "IANA timezone"
+          },
+          "pricePerHour": {
+            "type": "number",
+            "example": 5000,
+            "description": "Price per hour in minor units (cents)"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "type",
+          "capacity",
+          "city",
+          "timezone",
+          "pricePerHour"
         ]
       }
     }
