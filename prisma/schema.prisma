@@ -14,6 +14,7 @@ model User {
   role         String         @default("customer")
   createdAt    DateTime @default(now()) @map("created_at")
   tokens       RefreshToken[]
+  bookings     Booking[]
 
   @@map("users")
 }
@@ -50,6 +51,7 @@ model Resource {
 
   schedules    ResourceSchedule[]
   blackouts    ResourceBlackout[]
+  bookings     Booking[]
 
   @@map("resources")
 }
@@ -76,5 +78,30 @@ model ResourceBlackout {
   resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
 
   @@map("resource_blackouts")
+}
+
+model Booking {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  resourceId    String    @map("resource_id")
+  startsAt      DateTime  @map("starts_at") @db.Timestamptz
+  endsAt        DateTime  @map("ends_at") @db.Timestamptz
+  status        String    @default("held")
+  holdExpiresAt DateTime? @map("hold_expires_at") @db.Timestamptz
+  amountMinor   Int       @map("amount_minor")
+  currency      String    @default("UAH")
+  cancelledAt   DateTime? @map("cancelled_at") @db.Timestamptz
+  cancelReason  String?   @map("cancel_reason")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  version       Int       @default(1)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([resourceId, startsAt])
+  @@index([status, holdExpiresAt])
+  @@map("bookings")
 }
 
