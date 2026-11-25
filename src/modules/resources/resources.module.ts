@@ -4,6 +4,7 @@ import { RESOURCE_REPOSITORY } from './application/resource.repository';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 import { CreateResourceUseCase } from './application/create-resource.use-case';
 import { ListResourcesUseCase } from './application/list-resources.use-case';
+import { GetResourceUseCase } from './application/get-resource.use-case';
 import { UpdateScheduleUseCase } from './application/update-schedule.use-case';
 import { CreateBlackoutUseCase } from './application/create-blackout.use-case';
 import { RemoveBlackoutUseCase } from './application/remove-blackout.use-case';
@@ -18,6 +19,7 @@ import { UsersModule } from '../users/users.module';
     { provide: RESOURCE_REPOSITORY, useClass: PrismaResourceRepository },
     CreateResourceUseCase,
     ListResourcesUseCase,
+    GetResourceUseCase,
     UpdateScheduleUseCase,
     CreateBlackoutUseCase,
     RemoveBlackoutUseCase,

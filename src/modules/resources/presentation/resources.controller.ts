@@ -14,6 +14,7 @@ import {
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateResourceUseCase } from '../application/create-resource.use-case';
 import { ListResourcesUseCase, ListResourcesQuery } from '../application/list-resources.use-case';
+import { GetResourceUseCase } from '../application/get-resource.use-case';
 import { UpdateScheduleUseCase } from '../application/update-schedule.use-case';
 import { CreateBlackoutUseCase } from '../application/create-blackout.use-case';
 import { RemoveBlackoutUseCase } from '../application/remove-blackout.use-case';
@@ -23,6 +24,7 @@ import { Roles } from '../../users/presentation/decorators/roles.decorator';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { CreateBlackoutDto } from './dto/create-blackout.dto';
+import { ResourceDetailsResponseDto } from './dto/resource-details-response.dto';
 
 @ApiTags('resources')
 @Controller('resources')
@@ -30,6 +32,7 @@ export class ResourcesController {
   constructor(
     private readonly createResource: CreateResourceUseCase,
     private readonly listResources: ListResourcesUseCase,
+    private readonly getResource: GetResourceUseCase,
     private readonly updateSchedule: UpdateScheduleUseCase,
     private readonly createBlackout: CreateBlackoutUseCase,
     private readonly removeBlackout: RemoveBlackoutUseCase,
@@ -39,6 +42,14 @@ export class ResourcesController {
   @ApiOperation({ summary: 'List resources with filters and cursor pagination' })
   async list(@Query() query: ListResourcesQuery) {
     return this.listResources.execute(query);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get resource details including schedules and blackouts' })
+  @ApiResponse({ status: 200, type: ResourceDetailsResponseDto })
+  @ApiResponse({ status: 404, description: 'Resource not found' })
+  async findOne(@Param('id') id: string) {
+    return this.getResource.execute(id);
   }
 
   @Post()

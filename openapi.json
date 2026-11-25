@@ -281,6 +281,40 @@
         ]
       }
     },
+    "/resources/{id}": {
+      "get": {
+        "operationId": "ResourcesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceDetailsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "summary": "Get resource details including schedules and blackouts",
+        "tags": [
+          "resources"
+        ]
+      }
+    },
     "/resources/{id}/schedule": {
       "put": {
         "operationId": "ResourcesController_setSchedule",
@@ -544,6 +578,122 @@
         },
         "required": [
           "refreshToken"
+        ]
+      },
+      "ScheduleResponseDto": {
+        "type": "object",
+        "properties": {
+          "weekday": {
+            "type": "number",
+            "example": 1,
+            "description": "Weekday (0=Sunday, 1=Monday, ..., 6=Saturday)"
+          },
+          "opensAt": {
+            "type": "string",
+            "example": "09:00",
+            "description": "Opens at (HH:mm)"
+          },
+          "closesAt": {
+            "type": "string",
+            "example": "17:00",
+            "description": "Closes at (HH:mm)"
+          }
+        },
+        "required": [
+          "weekday",
+          "opensAt",
+          "closesAt"
+        ]
+      },
+      "BlackoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "01900000-0000-0000-0000-000000000000"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-12-25T00:00:00.000Z"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-12-26T00:00:00.000Z"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Maintenance"
+          }
+        },
+        "required": [
+          "id",
+          "startsAt",
+          "endsAt",
+          "reason"
+        ]
+      },
+      "ResourceDetailsResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "01900000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string",
+            "example": "Conference Room A"
+          },
+          "description": {
+            "type": "string",
+            "example": "Spacious room with projector"
+          },
+          "type": {
+            "type": "string",
+            "example": "room"
+          },
+          "capacity": {
+            "type": "number",
+            "example": 10
+          },
+          "city": {
+            "type": "string",
+            "example": "Kyiv"
+          },
+          "timezone": {
+            "type": "string",
+            "example": "Europe/Kyiv"
+          },
+          "pricePerHour": {
+            "type": "number",
+            "example": 5000,
+            "description": "Price per hour in minor units"
+          },
+          "schedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleResponseDto"
+            }
+          },
+          "blackouts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BlackoutResponseDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "type",
+          "capacity",
+          "city",
+          "timezone",
+          "pricePerHour",
+          "schedules",
+          "blackouts"
         ]
       },
       "CreateResourceDto": {
