@@ -22,7 +22,11 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/jest/bin/jest --runInBand",
     "prepare": "husky",
     "verify": "pnpm lint && pnpm typecheck && pnpm test",
-    "openapi:export": "ts-node -r tsconfig-paths/register src/scripts/export-openapi.ts"
+    "openapi:export": "ts-node -r tsconfig-paths/register src/scripts/export-openapi.ts",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
