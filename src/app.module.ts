@@ -10,6 +10,7 @@ import { HealthModule } from './modules/health/health.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { ResourcesModule } from './modules/resources/resources.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ResourcesModule } from './modules/resources/resources.module';
     DatabaseModule,
     UsersModule,
     ResourcesModule,
+    BookingsModule,
     LoggerModule.forRoot({
       pinoHttp: {
         transport:

@@ -429,6 +429,42 @@
           "resources"
         ]
       }
+    },
+    "/bookings": {
+      "post": {
+        "operationId": "BookingsController_createHold",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Hold created successfully"
+          },
+          "400": {
+            "description": "Validation failed or start time in past"
+          },
+          "409": {
+            "description": "Slot unavailable or hold limit reached"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a booking hold",
+        "tags": [
+          "bookings"
+        ]
+      }
     }
   },
   "info": {
@@ -807,6 +843,31 @@
           "startsAt",
           "endsAt",
           "reason"
+        ]
+      },
+      "CreateBookingDto": {
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Resource ID"
+          },
+          "startsAt": {
+            "type": "string",
+            "example": "2026-12-01T10:00:00.000Z",
+            "description": "Start time (UTC ISO8601)"
+          },
+          "endsAt": {
+            "type": "string",
+            "example": "2026-12-01T12:00:00.000Z",
+            "description": "End time (UTC ISO8601)"
+          }
+        },
+        "required": [
+          "resourceId",
+          "startsAt",
+          "endsAt"
         ]
       }
     }

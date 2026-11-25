@@ -28,3 +28,19 @@ export class HoldExpiredError extends DomainError {
     Object.setPrototypeOf(this, HoldExpiredError.prototype);
   }
 }
+
+export class SlotUnavailableError extends DomainError {
+  constructor(message = 'Selected time slot is unavailable') {
+    super(message, ErrorCode.SLOT_UNAVAILABLE, 409);
+    this.name = 'SlotUnavailableError';
+    Object.setPrototypeOf(this, SlotUnavailableError.prototype);
+  }
+}
+
+export class HoldLimitReachedError extends DomainError {
+  constructor(message = 'Maximum active holds limit reached') {
+    super(message, ErrorCode.HOLD_LIMIT_REACHED, 400);
+    this.name = 'HoldLimitReachedError';
+    Object.setPrototypeOf(this, HoldLimitReachedError.prototype);
+  }
+}

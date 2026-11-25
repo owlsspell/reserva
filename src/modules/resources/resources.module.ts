@@ -24,6 +24,6 @@ import { UsersModule } from '../users/users.module';
     CreateBlackoutUseCase,
     RemoveBlackoutUseCase,
   ],
-  exports: [RESOURCE_REPOSITORY],
+  exports: [RESOURCE_REPOSITORY, GetResourceUseCase],
 })
 export class ResourcesModule {}
