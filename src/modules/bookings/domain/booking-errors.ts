@@ -6,7 +6,7 @@ export class InvalidStateTransitionError extends DomainError {
     super(
       `Cannot transition booking from '${currentState}' to '${targetState}'`,
       ErrorCode.INVALID_STATE_TRANSITION,
-      400,
+      409,
     );
     this.name = 'InvalidStateTransitionError';
     Object.setPrototypeOf(this, InvalidStateTransitionError.prototype);
@@ -23,7 +23,7 @@ export class StartInPastError extends DomainError {
 
 export class HoldExpiredError extends DomainError {
   constructor(message = 'Booking hold has expired') {
-    super(message, ErrorCode.HOLD_EXPIRED, 400);
+    super(message, ErrorCode.HOLD_EXPIRED, 410);
     this.name = 'HoldExpiredError';
     Object.setPrototypeOf(this, HoldExpiredError.prototype);
   }

@@ -1,13 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { BookingRepository } from '../application/booking.repository';
-import { Booking } from '../domain/booking';
+import { Booking, BookingStatus } from '../domain/booking';
+import { TimeRange } from '../domain/time-range';
+import { Money } from '../domain/money';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import { SlotUnavailableError } from '../domain/booking-errors';
-import { Prisma } from '@prisma/client';
+import { Prisma, Booking as PrismaBookingModel } from '@prisma/client';
 
 @Injectable()
 export class PrismaBookingRepository implements BookingRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  private toDomain(record: PrismaBookingModel): Booking {
+    return Booking.reconstitute({
+      id: record.id,
+      userId: record.userId,
+      resourceId: record.resourceId,
+      range: TimeRange.of(record.startsAt, record.endsAt),
+      status: record.status as BookingStatus,
+      amount: Money.of(record.amountMinor, record.currency),
+      holdExpiresAt: record.holdExpiresAt ?? record.createdAt,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    });
+  }
 
   async countActiveHolds(userId: string): Promise<number> {
     const now = new Date();
@@ -15,10 +31,93 @@ export class PrismaBookingRepository implements BookingRepository {
       where: {
         userId,
         status: 'held',
-        holdExpiresAt: {
-          gt: now,
-        },
+        holdExpiresAt: { gt: now },
       },
+    });
+  }
+
+  async findById(id: string): Promise<Booking | null> {
+    const record = await this.prisma.booking.findUnique({ where: { id } });
+    if (!record) return null;
+    return this.toDomain(record);
+  }
+
+  async findList(params: {
+    userId: string;
+    limit: number;
+    cursor?: string;
+    filters: {
+      status?: BookingStatus;
+      from?: Date;
+      to?: Date;
+    };
+  }): Promise<{ data: Booking[]; nextCursor: string | null }> {
+    const { userId, limit, cursor, filters } = params;
+    const decodedCursor = cursor ? JSON.parse(Buffer.from(cursor, 'base64').toString()) : undefined;
+
+    const where: Prisma.BookingWhereInput = {
+      userId,
+      status: filters.status,
+      startsAt: filters.from ? { gte: filters.from } : undefined,
+      endsAt: filters.to ? { lte: filters.to } : undefined,
+      id: decodedCursor ? { lt: decodedCursor.id } : undefined,
+    };
+
+    const records = await this.prisma.booking.findMany({
+      where,
+      orderBy: { id: 'desc' },
+      take: limit + 1,
+    });
+
+    const hasMore = records.length > limit;
+    const data = records.slice(0, limit);
+    const lastItem = data[data.length - 1];
+    const nextCursor =
+      hasMore && lastItem
+        ? Buffer.from(JSON.stringify({ id: lastItem.id })).toString('base64')
+        : null;
+
+    return {
+      data: data.map((r) => this.toDomain(r)),
+      nextCursor,
+    };
+  }
+
+  async cancel(
+    bookingId: string,
+    userId: string,
+    isAdmin: boolean,
+    _outboxEvent: {
+      aggregateType: string;
+      aggregateId: string;
+      type: string;
+      payload: unknown;
+    },
+  ): Promise<Booking | null> {
+    return this.prisma.$transaction(async (tx) => {
+      const where: Prisma.BookingWhereUniqueInput & Prisma.BookingWhereInput = {
+        id: bookingId,
+        status: { in: ['held', 'confirmed'] },
+        ...(isAdmin ? {} : { userId }),
+      };
+
+      const record = await tx.booking.findFirst({
+        where,
+      });
+
+      if (!record) {
+        return null;
+      }
+
+      const updatedRecord = await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          status: 'cancelled',
+          updatedAt: new Date(),
+        },
+      });
+
+      return this.toDomain(updatedRecord);
     });
   }
 

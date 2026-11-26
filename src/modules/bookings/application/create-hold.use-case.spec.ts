@@ -23,6 +23,18 @@ class FakeBookingRepository implements BookingRepository {
   async createHold(booking: Booking): Promise<void> {
     this.createdHold = booking;
   }
+
+  async findById(): Promise<Booking | null> {
+    return null;
+  }
+
+  async findList(): Promise<{ data: Booking[]; nextCursor: string | null }> {
+    return { data: [], nextCursor: null };
+  }
+
+  async cancel(): Promise<Booking | null> {
+    return null;
+  }
 }
 
 class FakeGetResourceUseCase {
