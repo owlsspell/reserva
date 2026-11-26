@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ResourceRepository } from '../application/resource.repository';
 import { Resource } from '../domain/resource';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
+import {
+  decodeCursor,
+  processPaginatedRecords,
+} from '../../../infrastructure/database/cursor-pagination.helper';
 import { Resource as PrismaResourceModel } from '@prisma/client';
 
 @Injectable()
@@ -122,7 +126,7 @@ export class PrismaResourceRepository implements ResourceRepository {
   }): Promise<{ data: Resource[]; nextCursor: string | null }> {
     const { limit, cursor, filters } = params;
 
-    const decodedCursor = cursor ? JSON.parse(Buffer.from(cursor, 'base64').toString()) : undefined;
+    const decodedCursor = decodeCursor(cursor);
 
     const where = {
       type: filters.type,
@@ -139,15 +143,7 @@ export class PrismaResourceRepository implements ResourceRepository {
       take: limit + 1,
     });
 
-    const hasMore = records.length > limit;
-    const data = records.slice(0, limit);
-    const lastItem = data[data.length - 1];
-    const nextCursor =
-      hasMore && lastItem
-        ? Buffer.from(JSON.stringify({ id: lastItem.id })).toString('base64')
-        : null;
-
-    return { data: data.map((r) => this.toDomain(r)), nextCursor };
+    return processPaginatedRecords(records, limit, (r) => this.toDomain(r));
   }
 
   private toDomain(record: PrismaResourceModel): Resource {

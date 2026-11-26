@@ -5,6 +5,10 @@ import { TimeRange } from '../domain/time-range';
 import { Money } from '../domain/money';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import { SlotUnavailableError } from '../domain/booking-errors';
+import {
+  decodeCursor,
+  processPaginatedRecords,
+} from '../../../infrastructure/database/cursor-pagination.helper';
 import { Prisma, Booking as PrismaBookingModel } from '@prisma/client';
 
 @Injectable()
@@ -53,7 +57,7 @@ export class PrismaBookingRepository implements BookingRepository {
     };
   }): Promise<{ data: Booking[]; nextCursor: string | null }> {
     const { userId, limit, cursor, filters } = params;
-    const decodedCursor = cursor ? JSON.parse(Buffer.from(cursor, 'base64').toString()) : undefined;
+    const decodedCursor = decodeCursor(cursor);
 
     const where: Prisma.BookingWhereInput = {
       userId,
@@ -69,18 +73,7 @@ export class PrismaBookingRepository implements BookingRepository {
       take: limit + 1,
     });
 
-    const hasMore = records.length > limit;
-    const data = records.slice(0, limit);
-    const lastItem = data[data.length - 1];
-    const nextCursor =
-      hasMore && lastItem
-        ? Buffer.from(JSON.stringify({ id: lastItem.id })).toString('base64')
-        : null;
-
-    return {
-      data: data.map((r) => this.toDomain(r)),
-      nextCursor,
-    };
+    return processPaginatedRecords(records, limit, (r) => this.toDomain(r));
   }
 
   async cancel(
