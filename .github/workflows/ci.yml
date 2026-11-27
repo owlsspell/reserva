@@ -14,6 +14,12 @@ jobs:
         ports: ['5432:5432']
         options: >-
           --health-cmd "pg_isready -U reserva" --health-interval 5s --health-timeout 3s --health-retries 10
+      postgres_test:
+        image: postgres:16-alpine
+        env: { POSTGRES_USER: reserva_test_db, POSTGRES_PASSWORD: test, POSTGRES_DB: reserva_test_db }
+        ports: ['5433:5432']
+        options: >-
+          --health-cmd "pg_isready -U reserva_test_db -d reserva_test_db" --health-interval 5s --health-timeout 3s --health-retries 10
       redis:
         image: redis:7-alpine
         ports: ['6379:6379']
@@ -33,13 +39,13 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: cp .env.example .env
+      - run: cp .env.example .env.test
       - run: pnpm prisma generate
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm prisma migrate deploy
-      # - run: pnpm test:integration
-      # - run: pnpm test:e2e
+      - run: pnpm test:db:migrate
       - run: pnpm test:concurrency
       - name: OpenAPI drift check
         run: pnpm openapi:export && git diff --exit-code openapi.json
