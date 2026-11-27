@@ -4,7 +4,7 @@ import { Booking, BookingStatus } from '../domain/booking';
 import { TimeRange } from '../domain/time-range';
 import { Money } from '../domain/money';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
-import { SlotUnavailableError } from '../domain/booking-errors';
+import { HoldLimitReachedError, SlotUnavailableError } from '../domain/booking-errors';
 import {
   decodeCursor,
   processPaginatedRecords,
@@ -122,6 +122,7 @@ export class PrismaBookingRepository implements BookingRepository {
       type: string;
       payload: unknown;
     },
+    maxActiveHolds: number,
   ): Promise<void> {
     const resourceId = booking.resourceId;
     const startsAt = booking.range.start;
@@ -129,6 +130,30 @@ export class PrismaBookingRepository implements BookingRepository {
 
     try {
       await this.prisma.$transaction(async (tx) => {
+        // 3a. Advisory locks (released automatically on commit/rollback).
+        // ALWAYS taken in the same order (user, then resource) so they can never deadlock.
+        //  - user lock: makes "count active holds + insert" atomic per user (hold limit);
+        //  - resource lock: serializes attempts per resource; without it concurrent
+        //    partially-overlapping INSERTs wait on each other's uncommitted rows in the
+        //    exclusion constraint check and can deadlock (40P01 / P2034).
+        // The exclusion constraint stays as the last line of defence.
+        const userLockKey = `user:${booking.userId}`;
+        const resourceLockKey = `resource:${resourceId}`;
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${userLockKey}::text, 0))`;
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${resourceLockKey}::text, 0))`;
+
+        // 3a'. Authoritative hold-limit check (the use case's check is only a fast pre-check)
+        const activeHolds = await tx.booking.count({
+          where: {
+            userId: booking.userId,
+            status: 'held',
+            holdExpiresAt: { gt: new Date() },
+          },
+        });
+        if (activeHolds >= maxActiveHolds) {
+          throw new HoldLimitReachedError('Maximum active holds limit reached');
+        }
+
         // 3b. Lazy expiry: free stale holds that block this interval
         await tx.$executeRaw`
           UPDATE bookings
