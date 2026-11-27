@@ -39,7 +39,9 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: cp .env.example .env
-      - run: cp .env.example .env.test
+      - run: |
+          echo "DATABASE_URL=postgresql://reserva_test_db:test@localhost:5433/reserva_test_db" > .env.test
+          echo "DATABASE_URL_TEST=postgresql://reserva_test_db:test@localhost:5433/reserva_test_db" >> .env.test
       - run: pnpm prisma generate
       - run: pnpm lint
       - run: pnpm typecheck
