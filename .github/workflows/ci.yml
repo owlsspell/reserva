@@ -20,6 +20,7 @@ jobs:
         options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
       DATABASE_URL: postgresql://reserva:reserva@localhost:5432/reserva
+      DATABASE_URL_TEST: postgresql://reserva_test_db:test@localhost:5433/reserva_test_db
       REDIS_URL: redis://localhost:6379
       JWT_ACCESS_SECRET: change-me-access-min-32-chars-long
       JWT_REFRESH_SECRET: change-me-refresh-min-32-chars-long
@@ -39,6 +40,6 @@ jobs:
       - run: pnpm prisma migrate deploy
       # - run: pnpm test:integration
       # - run: pnpm test:e2e
-      # - run: pnpm test:concurrency
+      - run: pnpm test:concurrency
       - name: OpenAPI drift check
         run: pnpm openapi:export && git diff --exit-code openapi.json
