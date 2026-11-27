@@ -79,7 +79,9 @@ export class CreateHoldUseCase {
       },
     };
 
-    await this.bookingRepository.createHold(booking, outboxEvent);
+    // The repository re-checks the limit atomically inside the transaction;
+    // the pre-check above is only a cheap fast-fail.
+    await this.bookingRepository.createHold(booking, outboxEvent, this.maxActiveHolds);
 
     return booking;
   }

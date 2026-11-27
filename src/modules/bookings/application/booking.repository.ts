@@ -3,12 +3,8 @@ import { Booking, BookingStatus } from '../domain/booking';
 export interface BookingRepository {
   createHold(
     booking: Booking,
-    outboxEvent: {
-      aggregateType: string;
-      aggregateId: string;
-      type: string;
-      payload: unknown;
-    },
+    outboxEvent: { aggregateType: string; aggregateId: string; type: string; payload: unknown },
+    maxActiveHolds: number,
   ): Promise<void>;
   countActiveHolds(userId: string): Promise<number>;
   findById(id: string): Promise<Booking | null>;
