@@ -45,6 +45,10 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm prisma migrate deploy
+      - name: Migrate test DB
+        run: pnpm prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
       # - run: pnpm test:integration
       # - run: pnpm test:e2e
       - run: pnpm test:db:migrate

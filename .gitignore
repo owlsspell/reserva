@@ -1,8 +1,6 @@
 node_modules
 dist
 coverage
-.env
-.env.*
 !.env.example
 !.env.test
 *.log
@@ -11,3 +9,4 @@ coverage
 !.vscode/extensions.json
 .claude/settings.local.json
 
+config.bat
