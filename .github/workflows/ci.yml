@@ -47,8 +47,6 @@ jobs:
       - run: pnpm prisma migrate deploy
       - name: Migrate test DB
         run: pnpm prisma migrate deploy
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
       - run: pnpm test:db:migrate
       - run: pnpm test:concurrency
       - name: OpenAPI drift check
